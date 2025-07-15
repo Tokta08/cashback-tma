@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashBack Pro | Ваш кешбек-помощник</title>
+    <script src="https://telegram.org/js/twa.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px; /* Для нижнего меню */
+        }
+        
+        /* Шапка */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--dark);
+        }
+        
+        .logo i {
+            color: var(--primary);
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .balance-preview {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Главный баннер */
+        .main-banner {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .banner-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .banner-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 15px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 24px;
+            background: white;
+            color: var(--primary);
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 2;
+            font-size: 16px;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Категории магазинов */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 25px 0 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 22px;
+            color: var(--primary);
+        }
+        
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        /* Список магазинов */
+        .shop-list {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .shop-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .shop-item:last-child {
+            border-bottom: none;
+        }
+        
+        .shop-item:hover {
+            background: #f9f9ff;
+        }
+        
+        .shop-icon {
+            width: 50px;
+            height: 50px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .shop-info {
+            flex-grow: 1;
+        }
+        
+        .shop-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .shop-cashback {
+            font-size: 14px;
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .shop-arrow {
+            color: var(--gray);
+            font-size: 18px;
+        }
+        
+        /* Промокод */
+        .promo-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .promo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .promo-code {
+            background: #f0f4ff;
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+        
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        /* История */
+        .history-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+        }
+        
+        .history-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+            color: white;
+            background: var(--success);
+        }
+        
+        .history-info {
+            flex-grow: 1;
+        }
+        
+        .history-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .history-date {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .history-amount {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--success);
+        }
+        
+        /* Нижнее меню */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+            
+            .balance-amount {
+                font-size: 36px;
+            }
+            
+            .categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка приложения -->
+        <div class="app-header">
+            <div class="logo">
+                <i class="fas fa-cash-register"></i>
+                <span>CashBack Pro</span>
+            </div>
+            
+            <div class="user-section">
+                <div class="balance-preview">1,840 ₽</div>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Главный баннер -->
+        <div class="main-banner">
+            <div class="banner-title">Ваш кешбек</div>
+            <div class="banner-subtitle">Накоплено за всё время</div>
+            <div class="balance-amount">1,840 ₽</div>
+            <button class="btn" id="withdrawBtn">
+                <i class="fas fa-arrow-right"></i> Вывести деньги
+            </button>
+        </div>
+        
+        <!-- Категории магазинов -->
+        <div class="section-title">
+            <i class="fas fa-shopping-cart"></i>
+            Категории магазинов
+        </div>
+        
+        <div class="categories">
+            <div class="category-card" data-category="fashion">
+                <div class="category-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="category-name">Одежда</div>
+            </div>
+            
+            <div class="category-card" data-category="electronics">
+                <div class="category-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <div class="category-name">Электроника</div>
+            </div>
+            
+            <div class="category-card" data-category="food">
+                <div class="category-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="category-name">Продукты</div>
+            </div>
+            
+            <div class="category-card" data-category="home">
+                <div class="category-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="category-name">Для дома</div>
+            </div>
+            
+            <div class="category-card" data-category="beauty">
+                <div class="category-icon">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <div class="category-name">Красота</div>
+            </div>
+            
+            <div class="category-card" data-category="all">
+                <div class="category-icon">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <div class="category-name">Все магазины</div>
+            </div>
+        </div>
+        
+        <!-- Популярные магазины -->
+        <div class="section-title">
+            <i class="fas fa-fire"></i>
+            Популярные магазины
+        </div>
+        
+        <div class="shop-list">
+            <div class="shop-item" data-shop="wb">
+                <div class="shop-icon">
+                    <i class="fab fa-windows"></i>
+                </div>
+                <div class="shop-info">
+                    <div class="shop-name">Wildberries</div>
+                    <div class="shop-cashback">кешбек до 15%</div>
+                </div>
+                <div class="shop-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="shop-item" data-shop="ozon">
+                <div class="shop-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="shop-info">
+                    <div class="shop-name">Ozon</div>
+                    <div class="shop-cashback">кешбек до 10%</div>
+                </div>
+                <div class="shop-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="shop-item" data-shop="aliexpress">
+                <div class="shop-icon">
+                    <i class="fab fa-alipay"></i>
+                </div>
+                <div class="shop-info">
+                    <div class="shop-name">AliExpress</div>
+                    <div class="shop-cashback">кешбек до 8%</div>
+                </div>
+                <div class="shop-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="shop-item" data-shop="lamoda">
+                <div class="shop-icon">
+                    <i class="fas fa-socks"></i>
+                </div>
+                <div class="shop-info">
+                    <div class="shop-name">Lamoda</div>
+                    <div class="shop-cashback">кешбек до 12%</div>
+                </div>
+                <div class="shop-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Активный промокод -->
+        <div class="promo-card">
+            <div class="promo-title">Активный промокод</div>
+            <div>Используйте этот промокод при заказе на Wildberries</div>
+            <div class="promo-code">SUMMER2024</div>
+            <button class="copy-btn" id="copyPromoBtn">
+                <i class="fas fa-copy"></i> Скопировать код
+            </button>
+        </div>
+        
+        <!-- История операций -->
+        <div class="section-title">
+            <i class="fas fa-history"></i>
+            История операций
+        </div>
+        
+        <div class="history-item">
+            <div class="history-icon">
+                <i class="fab fa-windows"></i>
+            </div>
+            <div class="history-info">
+                <div class="history-title">Wildberries</div>
+                <div class="history-date">Сегодня, 14:30</div>
+            </div>
+            <div class="history-amount">+189 ₽</div>
+        </div>
+        
+        <div class="history-item">
+            <div class="history-icon" style="background: var(--primary);">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="history-info">
+                <div class="history-title">Ozon</div>
+                <div class="history-date">Вчера, 19:45</div>
+            </div>
+            <div class="history-amount">+347 ₽</div>
+        </div>
+        
+        <div class="history-item">
+            <div class="history-icon" style="background: var(--warning);">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="history-info">
+                <div class="history-title">Вывод средств</div>
+                <div class="history-date">12 июля, 16:15</div>
+            </div>
+            <div class="history-amount">-1,000 ₽</div>
+        </div>
+    </div>
+    
+    <!-- Нижнее меню -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div>Главная</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-store"></i></div>
+            <div>Магазины</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-gift"></i></div>
+            <div>Промокоды</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div>Профиль</div>
+        </a>
+    </div>
+    
+    <script>
+        // Инициализация Telegram WebApp
+        const webApp = window.Telegram.WebApp;
+        
+        // Основные настройки
+        webApp.ready();
+        webApp.expand();
+        webApp.enableClosingConfirmation();
+        
+        // Показываем кнопку "Назад"
+        webApp.BackButton.show();
+        webApp.BackButton.onClick(() => {
+            webApp.close();
+        });
+        
+        // Функция вывода средств
+        document.getElementById('withdrawBtn').addEventListener('click', () => {
+            webApp.showPopup({
+                title: 'Вывод средств',
+                message: 'Выберите способ вывода:',
+                buttons: [
+                    { id: 'card', type: 'default', text: '💳 На карту' },
+                    { id: 'wallet', type: 'default', text: '👛 На кошелек' },
+                    { type: 'cancel' }
+                ]
+            }).then(btnId => {
+                if(btnId === 'card') {
+                    webApp.showAlert('Переход к привязке карты...');
+                } else if(btnId === 'wallet') {
+                    webApp.showAlert('Переход к кошельку...');
+                }
+            });
+        });
+        
+        // Копирование промокода
+        document.getElementById('copyPromoBtn').addEventListener('click', () => {
+            const promoCode = "SUMMER2024";
+            navigator.clipboard.writeText(promoCode).then(() => {
+                webApp.showAlert('Промокод скопирован!');
+            });
+        });
+        
+        // Обработка выбора магазина
+        document.querySelectorAll('.shop-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const shopName = this.querySelector('.shop-name').textContent;
+                const cashback = this.querySelector('.shop-cashback').textContent;
+                
+                webApp.showPopup({
+                    title: shopName,
+                    message: `${cashback}\n\nИспользуйте наш бот для покупок в этом магазине, чтобы получить кешбек`,
+                    buttons: [
+                        { type: 'ok', text: 'Понятно' }
+                    ]
+                });
+            });
+        });
+        
+        // Обработка категорий
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const categoryName = this.querySelector('.category-name').textContent;
+                webApp.showAlert(`Открываем категорию: ${categoryName}`);
+            });
+        });
+        
+        // Инициализация пользователя
+        if (webApp.initDataUnsafe.user) {
+            const user = webApp.initDataUnsafe.user;
+            const avatar = document.querySelector('.user-avatar');
+            
+            // Генерируем инициалы
+            const firstNameLetter = user.first_name ? user.first_name.charAt(0) : 'U';
+            avatar.innerHTML = firstNameLetter;
+            
+            // Генерируем градиент на основе user.id
+            const colors = ['#4361ee', '#3a0ca3', '#4cc9f0', '#2ec4b6'];
+            const colorIndex = user.id % colors.length;
+            avatar.style.background = `linear-gradient(45deg, ${colors[colorIndex]}, ${colors[(colorIndex + 1) % colors.length]})`;
+        }
+    </script>
+</body>
+</html>
